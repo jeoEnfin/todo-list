@@ -14,7 +14,21 @@ app.get('/', function (req, res) {
 });
 
 app.get('/todos', function (req, res) {
-    res.json(todos);
+    var queryParams = req.query;
+    var filterdTodos = todos;
+    if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
+        filterdTodos = _.where(filterdTodos, {completed: true});
+    } else if (queryParams.completed === 'false' && queryParams.hasOwnProperty('completed')) {
+        filterdTodos = _.where(filterdTodos, {completed: false});
+    }
+
+    if(queryParams.hasOwnProperty('q')&& queryParams.q.length> 0) {
+        filterdTodos = _.filter(filterdTodos, function(todo) {
+            return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+        })
+    }
+
+    res.json(filterdTodos);
 });
 
 // GET /todos/:id
