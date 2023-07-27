@@ -59,7 +59,6 @@ app.post('/todos', function (req, res) {
     });
 });
 
-
 // DELETE /todos/:id
 app.delete('/todos/:id', function (req, res) {
     var todoId = parseInt(req.params.id, 10);
@@ -106,6 +105,17 @@ app.put('/todos/:id', function (req, res) {
         res.status(500).send();
     })
 });
+
+// POST/users
+app.post('/users', function (req, res) {
+    var body = _.pick(req.body, 'email', 'password');
+    db.user.create(body).then(function (user) {
+        res.json(user.toJSON());
+    }, function (err) {
+        res.status(400).json(err);
+    });
+});
+
 
 
 db.sequelize.sync().then(function () {
