@@ -44,6 +44,9 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         classMethods: {
+            /* The `authenticate` function is a class method defined on the `user` model. It takes in a
+            `body` object as a parameter, which is expected to have an `email` and `password`
+            property. */
             authenticate: function (body) {
                 return new Promise(function (resolve, reject) {
                     if (typeof body.email !== 'string' || typeof body.password !== 'string') {
@@ -67,6 +70,9 @@ module.exports = function (sequelize, DataTypes) {
                 var json = this.toJSON();
                 return _.pick(json, 'id', 'email', 'createdAt', 'updatedAt');
             },
+            /* The `generateToken` function is a method defined on the `user` model. It generates a
+            token for the user using JSON Web Tokens (JWT) and encrypts the user's id and type using
+            AES encryption. The generated token is then returned. */
             generateToken: function (type) {
                 if(!_.isString(type)) {
                     return undefined;
