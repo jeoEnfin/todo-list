@@ -63,7 +63,29 @@ module.exports = function (sequelize, DataTypes) {
                         return reject();
                     })
                 });
-            }
+            },
+            findByToken: function (token) {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        var decodedJWT = jwt.verify(token, 'qwertyuiop');
+                        var bytes = cryptojs.AES.decrypt(decodedJWT.token, 'abc123!@#!');
+                        var tokenData = JSON.parse(bytes.toString(cryptojs.enc.Utf8));
+
+                        user.findById(tokenData.id).then(function (user) {
+                            if (user) {
+                                resolve(user);
+                            } else {
+                                reject();
+                            }
+                        }, function (err) {
+                            reject();
+                        })
+                    }
+                    catch (err) {
+                        reject();
+                    }
+                });
+            },
         },
         instanceMethods: {
             toPublicJSON: function () {
@@ -74,13 +96,13 @@ module.exports = function (sequelize, DataTypes) {
             token for the user using JSON Web Tokens (JWT) and encrypts the user's id and type using
             AES encryption. The generated token is then returned. */
             generateToken: function (type) {
-                if(!_.isString(type)) {
+                if (!_.isString(type)) {
                     return undefined;
                 }
                 try {
-                    var stringData = JSON.stringify({id: this.get('id'),type: type});
+                    var stringData = JSON.stringify({ id: this.get('id'), type: type });
                     var encryptedData = cryptojs.AES.encrypt(stringData, 'abc123!@#!').toString();
-                    var token = jwt.sign({token: encryptedData}, 'qwertyuiop');
+                    var token = jwt.sign({ token: encryptedData }, 'qwertyuiop');
                     return token;
                 } catch (err) {
                     return undefined;
